@@ -6,14 +6,14 @@
 
 | Lớp | Model + cỡ | Ngưỡng | Vì sao (dẫn `run_id` trong `model_log.csv`) |
 |---|---|---|---|
-| person / bicycle / motorbike / car / bus / truck | <<YOLO26m>> | <<theo lớp, từ threshold_sweep>> | <<>> |
-| three_wheeler | <<YOLOE-26s, prompt: ...>> | <<>> | <<>> |
+| person / bicycle / motorbike / car / bus / truck | YOLO26m | person=0.15; motorbike=0.10; bicycle/car/bus/truck=0.30 (mặc định) | `r01`: YOLO26m làm pre-label cho các lớp COCO; sweep trên 4 ảnh gold đề xuất person (18 vật: recall 94%, precision 50%) và motorbike (11 vật: recall 91%, precision 40%). Bicycle có 7 vật, recall tối đa 71%; car có 9 vật, tối đa 89%; bus và truck không có vật gold nên giữ mặc định. |
+| three_wheeler | YOLOE-26s, prompt theo taxonomy | 0.15 | `r03`: YOLOE tìm lớp xe ba bánh; sweep trên 7 vật gold đạt recall 100%, precision 78% tại 0.15. |
 
 - Lệnh `merge_prelabels.py` đã dùng (dán nguyên): <<>>
 - **Phiên bản SAM bạn chọn** (SAM 1 / 2.1 / 3) và lý do: <<chất lượng mask, tốc độ, RAM, quyền truy cập>>
 - Lỗi nào **không sửa được bằng đổi ngưỡng** (ví dụ tuk-tuk bị gọi `car`)? Sửa thế nào? <<>>
 - Box **điểm cao mà sai** hoặc **điểm thấp mà đúng** (ảnh nào): <<>>
-- Giới hạn: chọn ngưỡng trên chính gold (4 ảnh) nên số đo máy trên gold là lạc quan: <<>>
+- Giới hạn: sweep chỉ có 4 ảnh gold; ngưỡng và precision/recall được chọn, đo trên cùng tập nên số đo trên gold lạc quan. Các lớp ít mẫu (bicycle 7, bus/truck 0) chưa đủ dữ liệu để chọn ngưỡng riêng; xem `submission/qc/threshold_sweep.md` và `.csv`.
 
 ## 2. AI error profile (từ `qc/review_stats.md`)
 
