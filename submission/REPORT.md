@@ -46,10 +46,11 @@
 
 | Ảnh | SAM (phiên bản) | Số click | Mask gồm người lái / hàng hoá? | Lỗi quan sát | File trong `masks/` |
 |---|---|---|---|---|---|
-| <<img_0xx>> | <<>> | <<>> | <<>> | <<>> | <<>> |
+| `img_002` tuk-tuk xanh | SAM 2.1 base (`sam2.1_b.pt`, Colab CPU) | 4 (2 dương, 2 âm) | Không cố ý lấy người lái; không thấy hàng hoá. Có lẫn một ít người/nền nhìn xuyên qua khung hở. | Mask bám sát mái và thân xe, nhưng vùng khung hở còn lẫn cảnh phía sau. | `tuktuk_img002.jpg` |
+| `img_013` tuk-tuk có người lái | SAM 2.1 base (`sam2.1_b.pt`, Colab CPU) | 10 ở lượt cuối (5 dương, 5 âm; tinh chỉnh qua 3 lượt) | Tách được phần lớn người lái/hành khách; còn dính ít vùng chân người lái. Không có hàng hoá đáng kể. | Cần nhiều click âm; biên quanh khung hở và người ngồi gần xe chưa sạch hoàn toàn. | `tuktuk_driver_img013.jpg` |
+| `img_032` xích lô | SAM 2.1 base (`sam2.1_b.pt`, Colab CPU) | 4 (3 dương, 1 âm) | Không; không thấy hàng hoá. | Bao được ghế, khung và bánh xe; các lỗ giữa khung là vùng dễ sai nếu cần polygon thật sát. | `cyclo_img032.jpg` |
 
-- Đối chiếu guideline mục 4.2: quy tắc nào giúp, quy tắc nào thiếu? <<>>
-- *(Tuỳ chọn)* Interactor SAM trong CVAT: làm được / không (lỗi gì, đã thử gì); khác gì offline: <<>>
+- Đối chiếu guideline mục 4.2: quy tắc đường biên phần nhìn thấy và tách hai vật chạm nhau giúp xác định mask xe riêng với người. Quy tắc về lỗ nhỏ (<5%) cho phép không vẽ các khe nhỏ của khung xích lô. Cần chỉnh tay mask `img_013` quanh người lái và các vùng nhìn xuyên qua khung; click âm giảm lẫn người nhưng chưa làm biên hoàn toàn sạch.
 
 ## 6. Calibration (Part 6)
 
