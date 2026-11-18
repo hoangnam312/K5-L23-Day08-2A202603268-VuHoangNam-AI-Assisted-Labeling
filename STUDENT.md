@@ -5,8 +5,8 @@
 - Lớp (L2 / L3 / khác): L2
 - Tài khoản GitHub: hoangnam312
 - Repo bài nộp (URL): https://github.com/hoangnam312/K5-L23-Day08-2A202603268_VuHoangNam-AI-Assisted-Labeling
-- Commit chốt bài (hash): Chưa có commit chốt.
-- Máy: Windows 11, GPU (không có)>>
+- Commit chốt bài (hash): cd2817c10837fe68556b4049be36b6420a086058
+- Máy: Windows 11, GPU (không có)
 - CVAT (Docker): 2.74.1
 
 ## Kết quả tóm tắt (điền cuối bài; số lấy từ `submission/qc/*`, kèm mẫu số)
