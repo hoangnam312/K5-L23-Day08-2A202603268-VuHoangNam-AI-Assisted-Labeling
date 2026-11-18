@@ -1,0 +1,6 @@
+image,object_id,error_type,reviewer,note
+img_003.jpg,,khong,visual_review,"Đã rà overlay toàn ảnh; không thấy lỗi box/lớp rõ ràng ở mức hiển thị này. Ảnh đông người và xe, kết quả có thể bỏ sót lỗi nhỏ."
+img_006.jpg,,khong,visual_review,"Đã rà overlay toàn ảnh; cảnh dày, nhiều box chồng lấn do người/xe sát nhau; chưa xác nhận được lỗi cụ thể từ ảnh preview."
+img_014.jpg,,khong,visual_review,"Đã rà overlay toàn ảnh; chưa thấy lỗi nhãn/box rõ ràng ở preview."
+img_031.jpg,,khong,visual_review,"Đã rà overlay toàn ảnh; xe đạp và hàng chở nằm trong box bicycle, phù hợp quy tắc hàng gắn liền xe."
+img_035.jpg,,khong,visual_review,"Đã rà overlay toàn ảnh; cảnh đông, chưa xác nhận được lỗi cụ thể từ preview."

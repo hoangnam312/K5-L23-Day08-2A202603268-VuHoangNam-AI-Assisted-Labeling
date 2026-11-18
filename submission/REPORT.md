@@ -1,4 +1,4 @@
-# Báo cáo Day 08 — <<MSHV - Họ và tên>>
+# Báo cáo Day 08 — 2A202603268 - Vũ Hoàng Nam
 
 > Một file duy nhất cho cả bài (đã gộp recipe, QC và ghi chú cá nhân). Mọi con số kèm **mẫu số** và nguồn (file nào). Viết bằng lời của bạn.
 
@@ -9,11 +9,11 @@
 | person / bicycle / motorbike / car / bus / truck | YOLO26m | person=0.15; motorbike=0.10; bicycle/car/bus/truck=0.30 (mặc định) | `r01`: YOLO26m làm pre-label cho các lớp COCO; sweep trên 4 ảnh gold đề xuất person (18 vật: recall 94%, precision 50%) và motorbike (11 vật: recall 91%, precision 40%). Bicycle có 7 vật, recall tối đa 71%; car có 9 vật, tối đa 89%; bus và truck không có vật gold nên giữ mặc định. |
 | three_wheeler | YOLOE-26s, prompt theo taxonomy | 0.15 | `r03`: YOLOE tìm lớp xe ba bánh; sweep trên 7 vật gold đạt recall 100%, precision 78% tại 0.15. |
 
-- Lệnh `merge_prelabels.py` đã dùng (dán nguyên): <<>>
-- **Phiên bản SAM bạn chọn** (SAM 1 / 2.1 / 3) và lý do: <<chất lượng mask, tốc độ, RAM, quyền truy cập>>
-- Lỗi nào **không sửa được bằng đổi ngưỡng** (ví dụ tuk-tuk bị gọi `car`)? Sửa thế nào? <<>>
-- Box **điểm cao mà sai** hoặc **điểm thấp mà đúng** (ảnh nào): <<>>
-- Giới hạn: sweep chỉ có 4 ảnh gold; ngưỡng và precision/recall được chọn, đo trên cùng tập nên số đo trên gold lạc quan. Các lớp ít mẫu (bicycle 7, bus/truck 0) chưa đủ dữ liệu để chọn ngưỡng riêng; xem `submission/qc/threshold_sweep.md` và `.csv`.
+- Lệnh `merge_prelabels.py` đã dùng: không có lệnh merge được lưu trong `model_log.csv`; log ghi recipe YOLO26-M r01 và YOLOE-S r03 riêng, cùng ngưỡng/đầu ra ở cột `params`. Vì vậy không khôi phục chính xác nguyên văn lệnh gộp.
+- **Phiên bản SAM bạn chọn:** SAM 2.1 base (`sam2.1_b.pt`), chạy CPU; theo r05 đã tạo 3 mask. Chọn do đã có quy trình click và đầu ra cho đủ ba vật; chất lượng ở `img_013` còn dính chân người lái và cần dọn biên.
+- Lỗi **không sửa được bằng đổi ngưỡng**: YOLO26 gọi tuk-tuk là `car` ở `img_004`/`img_013`; sửa lớp theo taxonomy thành `three_wheeler`, tách người thành box `person` riêng.
+- Box điểm cao mà sai: r01 ghi xe xanh sát mép ở `img_011` bị gán `truck` với 0.77 và box quá rộng; tăng ngưỡng không sửa được nhầm lớp.
+- Giới hạn: sweep chỉ có 4 ảnh gold. Vì dùng cùng ảnh để chọn ngưỡng và đo kết quả, cần kiểm tra thêm trên ảnh mới. Bicycle có 7 vật; bus và truck không có vật gold nên chưa đủ dữ liệu chọn ngưỡng riêng. Xem `submission/qc/threshold_sweep.md` và `.csv`.
 
 ## 2. AI error profile (từ `qc/review_stats.md`)
 
@@ -25,7 +25,7 @@
 | added | 30 | 4.4% | 682 đối tượng sau duyệt |
 
 - Lớp có nhiều box máy bị xóa nhất là `three_wheeler`: 24 deleted và 5 edited; `motorbike` đứng tiếp theo với 27 deleted. Đây là số đếm theo lớp trong `qc/review_stats.md`. Model log r03 cũng ghi YOLOE có dự đoán xe ba bánh yếu hoặc thiếu ở một số ảnh pilot; đây là dấu hiệu cần rà lớp này kỹ hơn.
-- Trong 30 added có 15 trường hợp tương ứng với đổi lớp, nên số vật máy bỏ sót thật ước tính là 15. So với gold: precision máy 54.1% (46 TP / 85 dự đoán; 39 FP), recall 88.5% (46 TP / 52 đối tượng gold; 6 FN). Kết quả gold có tính lạc quan vì ngưỡng được chọn và chấm trên cùng 4 ảnh.
+- Trong 30 added có 15 trường hợp đổi lớp, nên máy bỏ sót khoảng 15 vật. Trên 4 ảnh gold: precision 54.1% (46/85), recall 88.5% (46/52). Cần kiểm tra thêm ảnh mới vì ngưỡng được chọn trên chính 4 ảnh này.
 
 ## 3. Thiên kiến tự động hóa và ảnh bẫy
 
@@ -54,26 +54,25 @@
 
 ## 6. Calibration (Part 6)
 
-- Số quyết định: <<>> (`calibration_decisions.csv`); quan trọng nhất (dẫn `CAL-xx`): <<>>
-- Quy tắc mới đã vào `guideline_v1.1_calibrated.md`: <<>>
-- Nguyên nhân gốc: <<guideline mơ hồ / chưa nắm quy tắc / máy>>
+- Số quyết định: 3 (`submission/qc/calibration_decisions.csv`), gồm 1 câu hỏi mở và 2 lỗi máy. `CAL-02` quan trọng nhất: tuk-tuk bị YOLO26 gọi là `car`; xe ba bánh phải gán `three_wheeler`, người ngồi là `person` riêng.
+- Quy tắc mới trong `submission/guidelines/guideline_v1.1_calibrated.md`: phân biệt xe đạp điện theo dấu hiệu động cơ nhìn thấy; tuk-tuk có mui vẫn là `three_wheeler`; rà ảnh không có dự đoán three_wheeler để phát hiện bỏ sót.
+- Nguyên nhân gốc: guideline v1.0 để mở câu hỏi xe đạp điện; lỗi tuk-tuk là giới hạn phân loại của máy; dự đoán rỗng của YOLOE không đảm bảo ảnh không có xe ba bánh.
 
 ## 7. QC và quyết định (Part 6)
 
-- Mẫu: <<n>> ảnh (<<m>> ảnh `can_review` + <<k>> ngẫu nhiên, seed 42); người kiểm: bạn (**hạn chế**: bạn vừa là người duyệt).
-- Lỗi theo **đối tượng**: <<.../... = ...%>> · theo **ảnh**: <<.../... = ...%>> (ngưỡng Release ≤ 2%)
-- Top lỗi (trong: bỏ sót, thừa, sai lớp, sai vị trí/kích thước, sai thuộc tính, sai mask) + một ảnh ví dụ mỗi loại: <<>>
-- **Giới hạn mẫu nhỏ** (cận trên 95% trong `qc_report_auto.md`): <<>>
-- Script kiểm được / không kiểm được (ví dụ ôm sát, cùng bỏ sót với máy, theo checklist thật): <<>>
+- Mẫu: 5 ảnh batch ngẫu nhiên (0 ảnh `can_review` + 5 ngẫu nhiên, seed 42), 127 đối tượng; không có ảnh ca khó. Ảnh: `img_003`, `img_006`, `img_014`, `img_031`, `img_035`.
+- Lỗi theo **đối tượng**: 0/127 = 0.0% · theo **ảnh**: 0/5 = 0.0% (ngưỡng Release ≤ 2%), theo `submission/qc/qc_report_auto.md`.
+- Top lỗi: không ghi nhận lỗi cụ thể trong 5 ảnh mẫu; không suy ra các loại lỗi khác không tồn tại trong toàn bộ tập.
+- **Giới hạn mẫu nhỏ**: chưa thể kết luận tỷ lệ lỗi của cả lô dưới 2% chỉ từ 5 ảnh mẫu.
+- Script đếm lỗi trong phiếu và số box; không xác nhận box có sát vật không, hoặc ảnh có vật bị bỏ sót không.
 
-**Quyết định: <<Release / Hold / Rework>>**, ngày <<YYYY-MM-DD>>. Lý do (đi theo Hold → Rework → Release): <<>>
-Nếu Rework / Hold, việc cần làm tiếp: <<>>
+**Quyết định: Release**, ngày 2026-11-18. Lý do: đã chốt câu hỏi calibration; QC không thấy lỗi trong 5 ảnh mẫu; bắt bẫy đạt 11/12 = 91.7% (cao hơn ngưỡng 80%). Mẫu chỉ gồm 5/24 ảnh nên cần kiểm tra thêm trước khi dùng nhãn.
 
 ## 8. Ghi chú cá nhân
 
-- **Dùng AI để làm bài** (công cụ nào, việc gì, kiểm tra thế nào; "không dùng" nếu không): <<>>
-- Gold có bị nhiễm không (bạn có nhìn pre-label hay hỏi AI trước khi gán xong)? <<không / có, như sau: ...>>
-- Máy / GPU / CVAT dùng; vướng mắc cài đặt: <<>>
-- Dùng cache `data/cache/` thay vì tự chạy? <<không / có, vì ...>>
-- Lỗi / bug script đã gặp (nếu có): <<>>
-- Một điều bạn làm khác lần sau: <<>>
+- **Dùng AI để làm bài:** Có; đã đối chiếu nội dung với log và ảnh mẫu.
+- Gold có bị nhiễm không: log hiện có không ghi lại thứ tự gán gold so với việc xem pre-label/hỏi AI, nên không thể xác nhận hồi cứu.
+- Máy / GPU / CVAT dùng; vướng mắc: Windows 11, không có GPU; CVAT Docker 2.74.1. Lệnh Python trực tiếp gặp runtime bật isolated/safe-path nên không tìm thấy module `common` trong script subprocess.
+- Dùng cache `data/cache/`: có; thư mục chứa cache YOLO26-M và YOLOE-26s, theo danh sách file hiện có.
+- Lỗi / bug script đã gặp: runtime Python của môi trường hiện tại chặn đường dẫn import script; `check_submission.py` vì vậy không chạy được lệnh con `validate_labels.py` trực tiếp.
+- Một điều làm khác lần sau: ghi lại lệnh merge nguyên văn, thời gian gán gold và quy trình tránh nhiễm trước khi bắt đầu từng Part.
