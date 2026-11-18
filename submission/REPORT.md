@@ -19,27 +19,28 @@
 
 | Trạng thái | Số | Tỉ lệ | Mẫu số |
 |---|---|---|---|
-| accepted | <<>> | <<>> | <<box máy>> |
-| edited | <<>> | <<>> | <<>> |
-| deleted | <<>> | <<>> | <<>> |
-| added | <<>> | <<>> | <<đối tượng sau duyệt>> |
+| accepted | 638 | 87.8% | 727 box máy |
+| edited | 14 | 1.9% | 727 box máy |
+| deleted | 75 | 10.3% | 727 box máy |
+| added | 30 | 4.4% | 682 đối tượng sau duyệt |
 
-- Lớp nào máy tệ nhất? Vì sao (dẫn ảnh)? <<>>
-- So với gold: precision / recall của **máy** <<>> (mẫu số: <<đối tượng gold>>)
+- Lớp có nhiều box máy bị xóa nhất là `three_wheeler`: 24 deleted và 5 edited; `motorbike` đứng tiếp theo với 27 deleted. Đây là số đếm theo lớp trong `qc/review_stats.md`. Model log r03 cũng ghi YOLOE có dự đoán xe ba bánh yếu hoặc thiếu ở một số ảnh pilot; đây là dấu hiệu cần rà lớp này kỹ hơn.
+- Trong 30 added có 15 trường hợp tương ứng với đổi lớp, nên số vật máy bỏ sót thật ước tính là 15. So với gold: precision máy 54.1% (46 TP / 85 dự đoán; 39 FP), recall 88.5% (46 TP / 52 đối tượng gold; 6 FN). Kết quả gold có tính lạc quan vì ngưỡng được chọn và chấm trên cùng 4 ảnh.
 
 ## 3. Thiên kiến tự động hóa và ảnh bẫy
 
-- Bắt bẫy: <<.../12>>; loại nào lọt: <<>>; vì sao (bạn đã bỏ bước nào của checklist)? <<>>
-- Accepted cao mà bắt bẫy thấp (hoặc ngược lại) nói gì về cách bạn duyệt? <<>>
+- Bắt được 11/12 bẫy (91.7%), đạt ngưỡng yêu cầu 80%. Bắt được extra 3/3, missing 2/3, wrong_class 3/3 và loose 3/3. Bẫy còn lọt là `img_022.jpg` (missing), theo `qc/review_stats.md`.
+- Kết quả sau khi cập nhật export cho thấy các bẫy wrong_class và loose trước đó đã được sửa đủ; bẫy missing ở `img_022.jpg` vẫn còn. Chỉ 12 bẫy nên khoảng tin cậy rộng; tỷ lệ này là phép kiểm tra quy trình duyệt, không chứng minh không còn lỗi khác.
+- Accepted (87.8%) cho biết phần lớn box máy được giữ với IoU đạt ngưỡng, nhưng không đo được vật bị bỏ sót. Cần đọc cùng kết quả bẫy 91.7% và giới hạn mẫu nhỏ; hai số đo phản ánh hai việc khác nhau.
 
 ## 4. Máy có đáng dùng không?
 
-- Thời gian (từ `time_log.csv`): gán tay <<... phút/ảnh>> vs duyệt <<... phút/ảnh>>. Thiên lệch (bạn gán gold trước nên đã quen cảnh): <<>>
-- Kết luận: <<có / không / chỉ cho lớp nào>>, dựa trên <<số liệu>>
+- Thời gian review là 120 phút / 24 ảnh = 5 phút/ảnh (`time_log.csv`). Chưa có dòng `gold_manual` trong time log, nên chưa đủ dữ liệu tính thời gian gán tay mỗi ảnh hoặc phần trăm tiết kiệm. So sánh thời gian nếu bổ sung sau cũng có thể thiên lệch vì 4 ảnh gold được gán trước giúp làm quen cảnh.
+- Kết luận: pre-label có ích như bản nháp có người kiểm tra, không đủ cơ sở dùng tự động. 87.8% box máy được giữ và bắt bẫy đạt 11/12 (91.7%), nhưng precision máy trên gold là 54.1%; cần review trực quan và sửa nhãn trước khi sử dụng. Gold chỉ có 4 ảnh và 12 bẫy là mẫu nhỏ.
 - **Ba quy tắc giảm thiên kiến của bạn** (mỗi quy tắc kiểm tra được bằng số hoặc việc làm):
-  1. <<>>
-  2. <<>>
-  3. <<>>
+  1. Ẩn nhãn máy và tự quét từng ảnh trước khi hiện box; checklist phải được hoàn tất cho đủ 24/24 ảnh.
+  2. Kiểm tra mọi box, kể cả box confidence cao; với từng ảnh rà theo thứ tự bỏ sót → thừa → sai lớp → box lỏng.
+  3. Sau export, đọc kết quả bẫy; chỉ coi bước review đạt khi bắt ít nhất 10/12 bẫy (>= 80%), nếu thấp hơn thì ghi nhận chưa đạt và review lại lô trước khi chốt.
 
 ## 5. Mask SAM cho 3 vật (Part 5)
 
